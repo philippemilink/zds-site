@@ -159,8 +159,15 @@
         display: none;
     }
 
-    .summary-part h4 > a.disabled {
-        background: none !important;
+    .summary-part h4 > a {
+        &:hover,
+        &:focus {
+            text-decoration: none !important;
+        }
+
+        &.disabled {
+            background: none !important;
+        }
     }
 }
 
