@@ -295,13 +295,16 @@
 
 <dl class="py method">
 <dt id="zds.mp.models.PrivateTopic.add_participant">
-<code class="sig-name descname"><span class="pre">add_participant</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zds.mp.models.PrivateTopic.add_participant" title="Lien permanent vers cette définition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">add_participant</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zds.mp.models.PrivateTopic.add_participant" title="Lien permanent vers cette définition">¶</a></dt>
 <dd><p>Add a participant to the private topic.
-If the user is already participating, do not add it again.
+If the user is already participating, do nothing.
 Send the <cite>participant_added</cite> signal if successful.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Paramètres</dt>
-<dd class="field-odd"><p><strong>user</strong> – the user to add to the private topic</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> – the user to add to the private topic</p></li>
+<li><p><strong>silent</strong> – specify if the <cite>participant_added</cite> signal should be silent (e.g. no notification)</p></li>
+</ul>
 </dd>
 <dt class="field-even">Lève</dt>
 <dd class="field-even"><p><a class="reference internal" href="#zds.mp.models.NotReachableError" title="zds.mp.models.NotReachableError"><strong>NotReachableError</strong></a> – if the user cannot receive private messages (e.g. a bot)</p>
