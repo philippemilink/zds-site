@@ -24,7 +24,7 @@ def _get_default_gallery(user):
 
     user_default_gallery = UserGallery.objects.filter(user=user, is_default=True).first()
     if not user_default_gallery:
-        gallery = Gallery(title=_("Galerie par défaut"), subtitle="", slug=_("galerie-par-default"))
+        gallery = Gallery(title=_(f"Galerie par défaut de {user.username}"), subtitle="", slug=_("galerie-par-default"))
         gallery.save()
         UserGallery(user=user, is_default=True, gallery=gallery, mode=GALLERY_WRITE).save()
     else:

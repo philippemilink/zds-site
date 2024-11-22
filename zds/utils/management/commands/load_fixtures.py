@@ -130,7 +130,9 @@ def load_gallery(cli, size, fake, *_, **__):
     profiles = list(Profile.objects.all())
     for user_index in range(0, nb_users):
         for gallery_index in range(0, nb_galleries):
-            gal = GalleryFactory(title=fake.text(max_nb_chars=80), subtitle=fake.text(max_nb_chars=200))
+            gal = GalleryFactory(
+                title=fake.text(max_nb_chars=80).capitalize(), subtitle=fake.text(max_nb_chars=200).capitalize()
+            )
             UserGalleryFactory(user=profiles[user_index].user, gallery=gal)
             __push_images_into_gallery(gal, user_index, gallery_index, nb_galleries, nb_images, nb_users)
     tps2 = time.time()
