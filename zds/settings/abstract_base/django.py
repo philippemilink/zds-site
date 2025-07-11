@@ -86,6 +86,9 @@ STATICFILES_FINDERS = (
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
+# Gather also *.map.{js,css} files to help debug minified codes
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = config.get("secret_key", "n!01nl+318#x75_%le8#s0=-*ysw&amp;y49uc#t=*wvi(9hnyii0z")
 

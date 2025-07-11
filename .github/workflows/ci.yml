@@ -222,6 +222,9 @@ jobs:
       - name: Check that no migration is missing
         run: python manage.py makemigrations --check --dry-run
 
+      - name: Check that Django's collectstatic works
+        run: python manage.py collectstatic
+
       - name: Build and start zmarkdown
         run: |
           make zmd-install

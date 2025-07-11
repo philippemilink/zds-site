@@ -63,7 +63,6 @@ SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 4
 MEDIA_ROOT = Path("/opt/zds/data/media")
 
 STATIC_ROOT = Path("/opt/zds/data/static")
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
 django_template_engine["APP_DIRS"] = False
 django_template_engine["OPTIONS"]["loaders"] = [
