@@ -47,7 +47,6 @@ def publish_container_new(
         # create subdirectory
         if not path.isdir(current_dir):
             makedirs(current_dir)
-        relative_ccl_path = "../"
         # if we are on big tuto, parts are rendered as
         # | Introduction
         # +-------------
@@ -55,7 +54,7 @@ def publish_container_new(
         # +-------------
         # | Conclusion
         if container.introduction and container.get_introduction():
-            render_introduction(base_dir, container, relative_ccl_path, rendered)
+            render_introduction(base_dir, container, rendered)
         children = copy.copy(container.children)
         container.children = []
         container.children_dict = {}
@@ -71,22 +70,26 @@ def publish_container_new(
             publish_container_new(db_object, base_dir, altered_version, rendered["children"][i])
 
         if container.conclusion and container.get_conclusion():
-            render_conclusion(base_dir, container, relative_ccl_path, rendered)
+            render_conclusion(base_dir, container, rendered)
 
 
-def render_conclusion(base_dir, container, relative_ccl_path, rendered):
+def render_conclusion(base_dir, container, rendered):
     part_path = Path(container.get_prod_path(relative=True), "conclusion.html")
-    args = {"text": container.get_conclusion()}
-    args["relative"] = relative_ccl_path
+    args = {
+        "text": container.get_conclusion(),
+        "relative": "../",
+    }
     parsed = rendered["conclusion"]
     container.conclusion = str(part_path)
     write_chapter_file(base_dir, container, part_path, parsed, {})
 
 
-def render_introduction(base_dir, container, relative_ccl_path, rendered):
+def render_introduction(base_dir, container, rendered):
     part_path = Path(container.get_prod_path(relative=True), "introduction.html")
-    args = {"text": container.get_introduction()}
-    args["relative"] = relative_ccl_path
+    args = {
+        "text": container.get_introduction(),
+        "relative": "../",
+    }
     parsed = rendered["introduction"]
     container.introduction = str(part_path)
     write_chapter_file(base_dir, container, part_path, parsed, {})
