@@ -81,7 +81,7 @@ def render_conclusion(base_dir, container, rendered):
     }
     parsed = rendered["conclusion"]
     container.conclusion = str(part_path)
-    write_chapter_file(base_dir, container, part_path, parsed, {})
+    write_chapter_file(base_dir, container, part_path, parsed)
 
 
 def render_introduction(base_dir, container, rendered):
@@ -92,7 +92,7 @@ def render_introduction(base_dir, container, rendered):
     }
     parsed = rendered["introduction"]
     container.introduction = str(part_path)
-    write_chapter_file(base_dir, container, part_path, parsed, {})
+    write_chapter_file(base_dir, container, part_path, parsed)
 
 
 def render_chapter_or_minituto(base_dir, container, rendered):
@@ -104,7 +104,6 @@ def render_chapter_or_minituto(base_dir, container, rendered):
         container,
         Path(container.get_prod_path(True)),
         parsed,
-        {},
     )
     for extract in container.children:
         extract.text = None
@@ -225,7 +224,7 @@ def publish_container(
     return path_to_title_dict
 
 
-def write_chapter_file(base_dir, container, part_path, parsed, path_to_title_dict, image_callback=None):
+def write_chapter_file(base_dir, container, part_path, parsed, path_to_title_dict={}, image_callback=None):
     """
     Takes a chapter (i.e a set of extract gathers in one html text) and write in into the right file.
 
