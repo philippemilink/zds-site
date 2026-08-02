@@ -37,21 +37,38 @@ def publish_container_new(
     :param rendered: dictionary of html-rendered parts of the tutorial
     :type rendered: dict
     """
-    current_dir = path.dirname(path.join(base_dir, container.get_prod_path(relative=True)))
-    if container.has_extracts():  # the container can be rendered in one template
-        render_chapter_or_minituto(base_dir, container, rendered)
-    else:  # separate render of introduction and conclusion
-        # create subdirectory
+    if container.has_extracts():
+        # the container can be rendered in one template
+        rendered["children"] = zip(rendered["children"], container.children)
+        args = {"container": rendered, "versioned_object": container}
+        write_chapter_file(
+            base_dir,
+            container,
+            Path(container.get_prod_path(True)),
+            render_to_string("tutorialv2/export/chapter.html", args),
+        )
+        for extract in container.children:
+            extract.text = None
+        container.introduction = None
+        container.conclusion = None
+    else:
+        # separate render of introduction and conclusion
+        current_dir = path.dirname(path.join(base_dir, container.get_prod_path(relative=True)))
         if not path.isdir(current_dir):
             makedirs(current_dir)
+
         # if we are on big tuto, parts are rendered as
         # | Introduction
         # +-------------
         # | Table content of part
         # +-------------
         # | Conclusion
+
         if container.get_introduction() != "":
-            render_introduction(base_dir, container, rendered)
+            part_path = Path(container.get_prod_path(relative=True), "introduction.html")
+            container.introduction = str(part_path)
+            write_chapter_file(base_dir, container, part_path, rendered["introduction"])
+
         children = copy.copy(container.children)
         container.children = []
         container.children_dict = {}
@@ -67,37 +84,9 @@ def publish_container_new(
             publish_container_new(base_dir, altered_version, rendered["children"][i])
 
         if container.get_conclusion() != "":
-            render_conclusion(base_dir, container, rendered)
-
-
-def render_conclusion(base_dir, container, rendered):
-    part_path = Path(container.get_prod_path(relative=True), "conclusion.html")
-    parsed = rendered["conclusion"]
-    container.conclusion = str(part_path)
-    write_chapter_file(base_dir, container, part_path, parsed)
-
-
-def render_introduction(base_dir, container, rendered):
-    part_path = Path(container.get_prod_path(relative=True), "introduction.html")
-    parsed = rendered["introduction"]
-    container.introduction = str(part_path)
-    write_chapter_file(base_dir, container, part_path, parsed)
-
-
-def render_chapter_or_minituto(base_dir, container, rendered):
-    rendered["children"] = zip(rendered["children"], container.children)
-    args = {"container": rendered, "versioned_object": container}
-    parsed = render_to_string("tutorialv2/export/chapter.html", args)
-    write_chapter_file(
-        base_dir,
-        container,
-        Path(container.get_prod_path(True)),
-        parsed,
-    )
-    for extract in container.children:
-        extract.text = None
-    container.introduction = None
-    container.conclusion = None
+            part_path = Path(container.get_prod_path(relative=True), "conclusion.html")
+            container.conclusion = str(part_path)
+            write_chapter_file(base_dir, container, part_path, rendered["conclusion"])
 
 
 def publish_container(
