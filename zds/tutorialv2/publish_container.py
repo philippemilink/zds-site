@@ -75,10 +75,6 @@ def publish_container_new(
 
 def render_conclusion(base_dir, container, rendered):
     part_path = Path(container.get_prod_path(relative=True), "conclusion.html")
-    args = {
-        "text": container.get_conclusion(),
-        "relative": "../",
-    }
     parsed = rendered["conclusion"]
     container.conclusion = str(part_path)
     write_chapter_file(base_dir, container, part_path, parsed)
@@ -86,10 +82,6 @@ def render_conclusion(base_dir, container, rendered):
 
 def render_introduction(base_dir, container, rendered):
     part_path = Path(container.get_prod_path(relative=True), "introduction.html")
-    args = {
-        "text": container.get_introduction(),
-        "relative": "../",
-    }
     parsed = rendered["introduction"]
     container.introduction = str(part_path)
     write_chapter_file(base_dir, container, part_path, parsed)
