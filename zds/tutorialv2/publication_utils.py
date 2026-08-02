@@ -72,17 +72,17 @@ def publish_content(db_object, versioned, is_major_update=True):
 
     # First write the files to a temporary directory: if anything goes wrong,
     # the last published version is not impacted !
-    tmp_path = path.join(settings.ZDS_APP["content"]["repo_public_path"], versioned.slug + "__building")
-    if path.exists(tmp_path):
-        shutil.rmtree(tmp_path)  # remove previous attempt, if any
+    building_path = path.join(settings.ZDS_APP["content"]["repo_public_path"], versioned.slug + "__building")
+    if path.exists(building_path):
+        shutil.rmtree(building_path)  # remove previous attempt, if any
 
     # render HTML:
     altered_version = copy.deepcopy(versioned)
-    char_count = publish_use_manifest(db_object.js_support, tmp_path, altered_version)
-    altered_version.dump_json(path.join(tmp_path, "manifest.json"))
+    char_count = publish_use_manifest(db_object.js_support, building_path, altered_version)
+    altered_version.dump_json(path.join(building_path, "manifest.json"))
 
     # make room for 'extra contents'
-    build_extra_contents_path = path.join(tmp_path, settings.ZDS_APP["content"]["extra_contents_dirname"])
+    build_extra_contents_path = path.join(building_path, settings.ZDS_APP["content"]["extra_contents_dirname"])
     makedirs(build_extra_contents_path)
     base_name = path.join(build_extra_contents_path, versioned.slug)
 
@@ -118,7 +118,7 @@ def publish_content(db_object, versioned, is_major_update=True):
 
     # this puts the manifest.json and base json file on the prod path.
     shutil.rmtree(public_version.get_prod_path(), ignore_errors=True)
-    shutil.copytree(tmp_path, public_version.get_prod_path())
+    shutil.copytree(building_path, public_version.get_prod_path())
     db_object.sha_public = versioned.current_version
     public_version.save()
     if settings.ZDS_APP["content"]["extra_content_generation_policy"] == "SYNC":
