@@ -31,7 +31,6 @@ def publish_container_new(
     rendered,
     template="tutorialv2/export/chapter.html",
     file_ext="html",
-    **ctx,
 ):
     """
     Generate the browser-diplay or epub of a content and its possible hierarchy
@@ -44,16 +43,15 @@ def publish_container_new(
     :type rendered: dict
     :param template: template to render a Container with extract
     :param file_ext: html (for zds) for xml, please see ``publish_content``
-    :param ctx: keyword args to pass to template
     """
     current_dir = path.dirname(path.join(base_dir, container.get_prod_path(relative=True)))
     if container.has_extracts():  # the container can be rendered in one template
-        render_chapter_or_minituto(base_dir, container, ctx, rendered, template)
+        render_chapter_or_minituto(base_dir, container, rendered, template)
     else:  # separate render of introduction and conclusion
         # create subdirectory
         if not path.isdir(current_dir):
             makedirs(current_dir)
-        relative_ccl_path = "../" + ctx.get("relative", ".")
+        relative_ccl_path = "../"
         # if we are on big tuto, parts are rendered as
         # | Introduction
         # +-------------
@@ -61,7 +59,7 @@ def publish_container_new(
         # +-------------
         # | Conclusion
         if container.introduction and container.get_introduction():
-            render_introduction(base_dir, container, ctx, file_ext, relative_ccl_path, rendered)
+            render_introduction(base_dir, container, file_ext, relative_ccl_path, rendered)
         children = copy.copy(container.children)
         container.children = []
         container.children_dict = {}
@@ -74,39 +72,33 @@ def publish_container_new(
             altered_version = copy.copy(child)
             container.children.append(altered_version)
             container.children_dict[altered_version.slug] = altered_version
-            publish_container_new(db_object, base_dir, altered_version, rendered["children"][i], **ctx)
+            publish_container_new(db_object, base_dir, altered_version, rendered["children"][i])
 
         if container.conclusion and container.get_conclusion():
-            render_conclusion(base_dir, container, ctx, file_ext, relative_ccl_path, rendered)
+            render_conclusion(base_dir, container, file_ext, relative_ccl_path, rendered)
 
 
-def render_conclusion(base_dir, container, ctx, file_ext, relative_ccl_path, rendered):
+def render_conclusion(base_dir, container, file_ext, relative_ccl_path, rendered):
     part_path = Path(container.get_prod_path(relative=True), "conclusion." + file_ext)
     args = {"text": container.get_conclusion()}
-    args.update(ctx)
     args["relative"] = relative_ccl_path
     parsed = rendered["conclusion"]
     container.conclusion = str(part_path)
     write_chapter_file(base_dir, container, part_path, parsed, {})
 
 
-def render_introduction(base_dir, container, ctx, file_ext, relative_ccl_path, rendered):
+def render_introduction(base_dir, container, file_ext, relative_ccl_path, rendered):
     part_path = Path(container.get_prod_path(relative=True), "introduction." + file_ext)
     args = {"text": container.get_introduction()}
-    args.update(ctx)
     args["relative"] = relative_ccl_path
-    if ctx.get("intro_ccl_template", None):
-        parsed = render_to_string(ctx.get("intro_ccl_template"), args)
-    else:
-        parsed = rendered["introduction"]
+    parsed = rendered["introduction"]
     container.introduction = str(part_path)
     write_chapter_file(base_dir, container, part_path, parsed, {})
 
 
-def render_chapter_or_minituto(base_dir, container, ctx, rendered, template):
+def render_chapter_or_minituto(base_dir, container, rendered, template):
     rendered["children"] = zip(rendered["children"], container.children)
     args = {"container": rendered, "versioned_object": container}
-    args.update(ctx)
     parsed = render_to_string(template, args)
     write_chapter_file(
         base_dir,
