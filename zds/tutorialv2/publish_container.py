@@ -50,7 +50,7 @@ def publish_container_new(
         # | Table content of part
         # +-------------
         # | Conclusion
-        if container.introduction and container.get_introduction():
+        if container.get_introduction() != "":
             render_introduction(base_dir, container, rendered)
         children = copy.copy(container.children)
         container.children = []
@@ -66,7 +66,7 @@ def publish_container_new(
             container.children_dict[altered_version.slug] = altered_version
             publish_container_new(base_dir, altered_version, rendered["children"][i])
 
-        if container.conclusion and container.get_conclusion():
+        if container.get_conclusion() != "":
             render_conclusion(base_dir, container, rendered)
 
 
