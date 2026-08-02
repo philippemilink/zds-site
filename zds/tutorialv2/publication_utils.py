@@ -86,11 +86,7 @@ def publish_content(db_object, versioned, is_major_update=True):
     makedirs(build_extra_contents_path)
     base_name = path.join(build_extra_contents_path, versioned.slug)
 
-    # 1. markdown file (base for the others) :
-    # If we come from a command line, we need to activate i18n, to have the date in the french language.
-    cur_language = translation.get_language()
-    altered_version.pubdate = datetime.now()
-
+    # markdown file (base for the others) :
     md_file_path = base_name + ".md"
     Path(Path(md_file_path).parent, "images").mkdir(exist_ok=True)
     is_update = False
