@@ -603,7 +603,7 @@ def get_commit_author():
     return {"author": Actor(aut_user, aut_email), "committer": Actor(aut_user, aut_email)}
 
 
-def export_extract(extract, with_text):
+def export_extract_to_dict(extract, with_text):
     """Export an extract to a dictionary
 
     :param extract: extract to export
@@ -625,7 +625,7 @@ def export_extract(extract, with_text):
     return dct
 
 
-def export_container(container, with_text=False, ready_to_publish_only=False):
+def export_container_to_dict(container, with_text=False, ready_to_publish_only=False):
     """Export a container to a dictionary
 
     :param container: the container
@@ -660,15 +660,15 @@ def export_container(container, with_text=False, ready_to_publish_only=False):
         for child in container.children:
             if ready_to_publish_only and not child.ready_to_publish:
                 continue
-            dct["children"].append(export_container(child, with_text, ready_to_publish_only))
+            dct["children"].append(export_container_to_dict(child, with_text, ready_to_publish_only))
     elif container.has_extracts():
         for child in container.children:
-            dct["children"].append(export_extract(child, with_text))
+            dct["children"].append(export_extract_to_dict(child, with_text))
 
     return dct
 
 
-def export_content(content, with_text=False, ready_to_publish_only=False):
+def export_content_to_dict(content, with_text=False, ready_to_publish_only=False):
     """Export a content to dictionary in order to store them in a JSON file
 
     :param content: content to be exported
@@ -677,7 +677,7 @@ def export_content(content, with_text=False, ready_to_publish_only=False):
     :return: dictionary containing the information
     :rtype: dict
     """
-    dct = export_container(content, with_text, ready_to_publish_only)
+    dct = export_container_to_dict(content, with_text, ready_to_publish_only)
 
     # append metadata :
     dct["version"] = 2.1

@@ -15,7 +15,13 @@ from git import Repo
 from zds import json_handler
 from zds.tutorialv2.models import CONTENT_TYPES_REQUIRING_VALIDATION
 from zds.tutorialv2.models.mixins import TemplatableContentModelMixin
-from zds.tutorialv2.utils import InvalidOperationError, default_slug_pool, export_content, get_blob, get_commit_author
+from zds.tutorialv2.utils import (
+    InvalidOperationError,
+    default_slug_pool,
+    export_content_to_dict,
+    get_blob,
+    get_commit_author,
+)
 from zds.utils.misc import compute_hash
 from zds.utils.templatetags.emarkdown import emarkdown
 from zds.utils.uuslug_wrapper import slugify
@@ -1342,7 +1348,7 @@ class VersionedContent(Container, TemplatableContentModelMixin):
         :return: raw JSON file
         :rtype: str
         """
-        dct = export_content(self)
+        dct = export_content_to_dict(self)
         data = json_handler.dumps(dct, indent=4, ensure_ascii=False)
         return data
 

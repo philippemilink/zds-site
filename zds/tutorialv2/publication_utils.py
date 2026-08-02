@@ -23,7 +23,7 @@ from zds.tutorialv2.epub_utils import build_ebook
 from zds.tutorialv2.models.database import ContentReaction, PublicationEvent, PublishedContent
 from zds.tutorialv2.publish_container import publish_use_manifest
 from zds.tutorialv2.signals import content_unpublished
-from zds.tutorialv2.utils import export_content
+from zds.tutorialv2.utils import export_content_to_dict
 from zds.utils.templatetags.emarkdown import render_markdown
 from zds.utils.templatetags.smileys_def import LICENSES_BASE_PATH, SMILEYS_BASE_PATH
 
@@ -388,7 +388,7 @@ class ZMarkdownRebberLatexPublicator(Publicator):
         replaced_media_url = settings.MEDIA_URL
         if replaced_media_url.startswith("/"):
             replaced_media_url = replaced_media_url[1:]
-        exported = export_content(public_versionned_source, with_text=True, ready_to_publish_only=True)
+        exported = export_content_to_dict(public_versionned_source, with_text=True, ready_to_publish_only=True)
         # no title to avoid zmd to put it on the final latex
         del exported["title"]
         content, metadata, messages = render_markdown(

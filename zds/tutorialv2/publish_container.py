@@ -10,12 +10,12 @@ from django.utils.translation import gettext_lazy as _
 
 from zds.tutorialv2.models.database import PublishableContent
 from zds.tutorialv2.models.versioned import Container, VersionedContent
-from zds.tutorialv2.utils import export_content
+from zds.tutorialv2.utils import export_content_to_dict
 from zds.utils.templatetags.emarkdown import emarkdown, render_markdown
 
 
 def publish_use_manifest(db_object, base_dir, versionable_content: VersionedContent):
-    base_content = export_content(versionable_content, with_text=True)
+    base_content = export_content_to_dict(versionable_content, with_text=True)
 
     md, metadata, __ = render_markdown(
         base_content, disable_jsfiddle=not db_object.js_support, use_manifest=True, stats=True
