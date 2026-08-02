@@ -20,20 +20,17 @@ def publish_use_manifest(db_object, base_dir, versionable_content: VersionedCont
     md, metadata, __ = render_markdown(
         base_content, disable_jsfiddle=not db_object.js_support, use_manifest=True, stats=True
     )
-    publish_container_new(db_object, base_dir, versionable_content, md)
+    publish_container_new(base_dir, versionable_content, md)
     return metadata.get("stats", {}).get("signs", 0)
 
 
 def publish_container_new(
-    db_object,
     base_dir,
     container: Container,
     rendered,
 ):
     """
     Generate the browser-diplay or epub of a content and its possible hierarchy
-    :param db_object:
-    :type db_object: zds.tutorialv2.models.database.PublishableContent
     :param base_dir: ``contents-public/{tutorial_slug}``
     :param container: tutorial/part/chapter depending of the depth of recursivity
     :type container: zds.tutorialv2.models.versionable.Container
@@ -67,7 +64,7 @@ def publish_container_new(
             altered_version = copy.copy(child)
             container.children.append(altered_version)
             container.children_dict[altered_version.slug] = altered_version
-            publish_container_new(db_object, base_dir, altered_version, rendered["children"][i])
+            publish_container_new(base_dir, altered_version, rendered["children"][i])
 
         if container.conclusion and container.get_conclusion():
             render_conclusion(base_dir, container, rendered)
