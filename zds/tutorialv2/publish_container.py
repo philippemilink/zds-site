@@ -29,7 +29,6 @@ def publish_container_new(
     base_dir,
     container: Container,
     rendered,
-    template="tutorialv2/export/chapter.html",
 ):
     """
     Generate the browser-diplay or epub of a content and its possible hierarchy
@@ -40,11 +39,10 @@ def publish_container_new(
     :type container: zds.tutorialv2.models.versionable.Container
     :param rendered: dictionary of html-rendered parts of the tutorial
     :type rendered: dict
-    :param template: template to render a Container with extract
     """
     current_dir = path.dirname(path.join(base_dir, container.get_prod_path(relative=True)))
     if container.has_extracts():  # the container can be rendered in one template
-        render_chapter_or_minituto(base_dir, container, rendered, template)
+        render_chapter_or_minituto(base_dir, container, rendered)
     else:  # separate render of introduction and conclusion
         # create subdirectory
         if not path.isdir(current_dir):
@@ -94,10 +92,10 @@ def render_introduction(base_dir, container, relative_ccl_path, rendered):
     write_chapter_file(base_dir, container, part_path, parsed, {})
 
 
-def render_chapter_or_minituto(base_dir, container, rendered, template):
+def render_chapter_or_minituto(base_dir, container, rendered):
     rendered["children"] = zip(rendered["children"], container.children)
     args = {"container": rendered, "versioned_object": container}
-    parsed = render_to_string(template, args)
+    parsed = render_to_string("tutorialv2/export/chapter.html", args)
     write_chapter_file(
         base_dir,
         container,
