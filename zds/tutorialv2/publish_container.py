@@ -30,7 +30,6 @@ def publish_container_new(
     container: Container,
     rendered,
     template="tutorialv2/export/chapter.html",
-    file_ext="html",
 ):
     """
     Generate the browser-diplay or epub of a content and its possible hierarchy
@@ -42,7 +41,6 @@ def publish_container_new(
     :param rendered: dictionary of html-rendered parts of the tutorial
     :type rendered: dict
     :param template: template to render a Container with extract
-    :param file_ext: html (for zds) for xml, please see ``publish_content``
     """
     current_dir = path.dirname(path.join(base_dir, container.get_prod_path(relative=True)))
     if container.has_extracts():  # the container can be rendered in one template
@@ -59,7 +57,7 @@ def publish_container_new(
         # +-------------
         # | Conclusion
         if container.introduction and container.get_introduction():
-            render_introduction(base_dir, container, file_ext, relative_ccl_path, rendered)
+            render_introduction(base_dir, container, relative_ccl_path, rendered)
         children = copy.copy(container.children)
         container.children = []
         container.children_dict = {}
@@ -75,11 +73,11 @@ def publish_container_new(
             publish_container_new(db_object, base_dir, altered_version, rendered["children"][i])
 
         if container.conclusion and container.get_conclusion():
-            render_conclusion(base_dir, container, file_ext, relative_ccl_path, rendered)
+            render_conclusion(base_dir, container, relative_ccl_path, rendered)
 
 
-def render_conclusion(base_dir, container, file_ext, relative_ccl_path, rendered):
-    part_path = Path(container.get_prod_path(relative=True), "conclusion." + file_ext)
+def render_conclusion(base_dir, container, relative_ccl_path, rendered):
+    part_path = Path(container.get_prod_path(relative=True), "conclusion.html")
     args = {"text": container.get_conclusion()}
     args["relative"] = relative_ccl_path
     parsed = rendered["conclusion"]
@@ -87,8 +85,8 @@ def render_conclusion(base_dir, container, file_ext, relative_ccl_path, rendered
     write_chapter_file(base_dir, container, part_path, parsed, {})
 
 
-def render_introduction(base_dir, container, file_ext, relative_ccl_path, rendered):
-    part_path = Path(container.get_prod_path(relative=True), "introduction." + file_ext)
+def render_introduction(base_dir, container, relative_ccl_path, rendered):
+    part_path = Path(container.get_prod_path(relative=True), "introduction.html")
     args = {"text": container.get_introduction()}
     args["relative"] = relative_ccl_path
     parsed = rendered["introduction"]
