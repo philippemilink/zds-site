@@ -78,7 +78,7 @@ def publish_content(db_object, versioned, is_major_update=True):
 
     # render HTML:
     altered_version = copy.deepcopy(versioned)
-    char_count = publish_use_manifest(db_object, tmp_path, altered_version)
+    char_count = publish_use_manifest(db_object.js_support, tmp_path, altered_version)
     altered_version.dump_json(path.join(tmp_path, "manifest.json"))
 
     # make room for 'extra contents'
