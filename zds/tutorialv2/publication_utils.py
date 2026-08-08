@@ -21,7 +21,7 @@ from zds.forum.utils import lock_topic, send_post
 from zds.tutorialv2 import signals
 from zds.tutorialv2.epub_utils import build_ebook
 from zds.tutorialv2.models.database import ContentReaction, PublicationEvent, PublishedContent
-from zds.tutorialv2.publish_container import publish_use_manifest
+from zds.tutorialv2.publish_container import publish_into_html_with_manifest
 from zds.tutorialv2.signals import content_unpublished
 from zds.tutorialv2.utils import export_content_to_dict
 from zds.utils.templatetags.emarkdown import render_markdown
@@ -78,7 +78,7 @@ def publish_content(db_object, versioned, is_major_update=True):
 
     # render HTML:
     altered_version = copy.deepcopy(versioned)
-    char_count = publish_use_manifest(db_object.js_support, building_path, altered_version)
+    char_count = publish_into_html_with_manifest(db_object.js_support, building_path, altered_version)
     altered_version.dump_json(path.join(building_path, "manifest.json"))
 
     # make room for 'extra contents'

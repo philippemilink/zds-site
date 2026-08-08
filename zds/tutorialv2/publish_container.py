@@ -14,35 +14,40 @@ from zds.tutorialv2.utils import export_content_to_dict
 from zds.utils.templatetags.emarkdown import emarkdown, render_markdown
 
 
-def publish_use_manifest(has_js_support, base_dir, versionable_content: VersionedContent):
+def publish_into_html_with_manifest(has_js_support, base_dir, versionable_content: VersionedContent):
+    """Generate and save the HTML version of a publication."""
+
+    # Get a dict version of the full content:
     base_content = export_content_to_dict(versionable_content, with_text=True)
 
-    md, metadata, __ = render_markdown(base_content, disable_jsfiddle=not has_js_support, use_manifest=True, stats=True)
-    publish_container_new(base_dir, versionable_content, md)
+    # Convert each Markdown chunk into HTML:
+    html, metadata, __ = render_markdown(
+        base_content, disable_jsfiddle=not has_js_support, use_manifest=True, stats=True
+    )
+
+    # Save each HTML chunk into its dedicated file, following the publication organization:
+    write_html_files(base_dir, versionable_content, html)
+
     return metadata.get("stats", {}).get("signs", 0)
 
 
-def publish_container_new(
-    base_dir,
-    container: Container,
-    rendered,
-):
+def write_html_files(base_dir: dict, container: Container, rendered: dict):
     """
-    Generate the browser-diplay or epub of a content and its possible hierarchy
+    Recursive function browsing the content hierarchy to convert it into HTML.
     :param base_dir: ``contents-public/{tutorial_slug}``
     :param container: tutorial/part/chapter depending of the depth of recursivity
     :type container: zds.tutorialv2.models.versionable.Container
-    :param rendered: dictionary of html-rendered parts of the tutorial
+    :param rendered: dictionary of html-rendered parts of the content
     :type rendered: dict
     """
     if container.has_extracts():
         # the container can be rendered in one template
         rendered["children"] = zip(rendered["children"], container.children)
         args = {"container": rendered, "versioned_object": container}
-        write_chapter_file(
+        write_file(
             base_dir,
             container,
-            Path(container.get_prod_path(True)),
+            Path(container.get_prod_path(relative=True)),
             render_to_string("tutorialv2/export/chapter.html", args),
         )
         for extract in container.children:
@@ -65,7 +70,7 @@ def publish_container_new(
         if container.get_introduction() != "":
             part_path = Path(container.get_prod_path(relative=True), "introduction.html")
             container.introduction = str(part_path)
-            write_chapter_file(base_dir, container, part_path, rendered["introduction"])
+            write_file(base_dir, container, part_path, rendered["introduction"])
 
         children = copy.copy(container.children)
         container.children = []
@@ -79,12 +84,12 @@ def publish_container_new(
             altered_version = copy.copy(child)
             container.children.append(altered_version)
             container.children_dict[altered_version.slug] = altered_version
-            publish_container_new(base_dir, altered_version, rendered["children"][i])
+            write_html_files(base_dir, altered_version, rendered["children"][i])
 
         if container.get_conclusion() != "":
             part_path = Path(container.get_prod_path(relative=True), "conclusion.html")
             container.conclusion = str(part_path)
-            write_chapter_file(base_dir, container, part_path, rendered["conclusion"])
+            write_file(base_dir, container, part_path, rendered["conclusion"])
 
 
 def publish_container(
@@ -137,7 +142,7 @@ def publish_container(
         args.update(ctx)
         args["relative"] = img_relative_path
         parsed = render_to_string(template, args)
-        write_chapter_file(
+        write_file(
             base_dir,
             container,
             Path(container.get_prod_path(True, file_ext)),
@@ -165,7 +170,7 @@ def publish_container(
             else:
                 parsed = emarkdown(container.get_introduction(), db_object.js_support)
             container.introduction = str(part_path)
-            write_chapter_file(base_dir, container, part_path, parsed, path_to_title_dict, wrapped_image_callback)
+            write_file(base_dir, container, part_path, parsed, path_to_title_dict, wrapped_image_callback)
         children = copy.copy(container.children)
         container.children = []
         container.children_dict = {}
@@ -195,12 +200,12 @@ def publish_container(
             else:
                 parsed = emarkdown(container.get_conclusion(), db_object.js_support)
             container.conclusion = str(part_path)
-            write_chapter_file(base_dir, container, part_path, parsed, path_to_title_dict, wrapped_image_callback)
+            write_file(base_dir, container, part_path, parsed, path_to_title_dict, wrapped_image_callback)
 
     return path_to_title_dict
 
 
-def write_chapter_file(base_dir, container, part_path, parsed, path_to_title_dict={}, image_callback=None):
+def write_file(base_dir, container, part_path, parsed, path_to_title_dict={}, image_callback=None):
     """
     Takes a chapter (i.e a set of extract gathers in one html text) and write in into the right file.
 
