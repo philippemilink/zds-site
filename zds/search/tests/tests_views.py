@@ -1129,3 +1129,22 @@ class ViewsTests(TutorialTestMixin, TestCase):
 
         # delete index:
         self.manager.clear_index()
+
+
+class ViewsWithoutSearchIndexTests(TestCase):
+    """This class connects to Typesense, but doesn't create collections nor populate the index."""
+
+    def setUp(self):
+        self.manager = SearchIndexManager()
+
+        if not self.manager.connected:
+            self.skipTest("Could not connect to search engine")
+
+    def test_error_during_search(self):
+        # We simulate an error during a search by using an incorrect API access key
+        settings.SEARCH_CONNECTION["api_key"] = "incorrect_key"
+
+        with self.assertLogs(level="ERROR") as error_log:
+            result = self.client.get(reverse("search:query") + "?q=foo", follow=False)
+        self.assertTrue(error_log.output[0].startswith("ERROR:zds.search.views:Typesense search raised an error:"))
+        self.assertEqual(result.status_code, 200)

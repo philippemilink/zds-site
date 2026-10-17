@@ -203,9 +203,17 @@ class SearchView(ZdSPagingListView):
                 "page": "1",
             }
 
-            search_results = search_engine_manager.engine.multi_search.perform(search_requests, common_search_params)[
-                "results"
-            ]
+            search_results = []
+
+            try:
+                # Exception like "ServiceUnavailable [Errno 503] Not Ready or Lagging" can happen when performing a search
+                search_results = search_engine_manager.engine.multi_search.perform(
+                    search_requests, common_search_params
+                )["results"]
+            except Exception as e:
+                logger.error(f"Typesense search raised an error: {e}")
+                messages.warning(self.request, _(f"Le moteur de recherche a renvoyé une erreur : {e}"))
+
             for i in range(len(search_results)):
                 if "error" in search_results[i]:
                     logger.warning(f"Typesearch answered with an error: {search_results[i]['error']}")
